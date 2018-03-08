@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org" 
+            xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+            xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4"
+            layout:decorator="template1" >
+<head>
+<meta charset="utf-8" />
+<title>Account</title>
+</head>
+<body>
+
+   <div layout:fragment="content">
+		<div class="col-md-6">
+			<div class="panel panel-primary">
+				<div class="panel-heading">Consult to an account!!</div>
+				  <div class="panel-body">
+				    
+				     <form th:action="@{/consultAccount}" method="get">
+				        <div>
+				          <lable>Code Account:</lable>
+				          <input type="text" name="codeAccount" th:value="${codeAccount}" />
+				          <button type="submit" class="btn btn-primary">Ok</button> 
+				        </div>			     
+				     </form>				
+				  </div>
+				  <div class="text-danger" th:if="${exception}" th:text="${exception.message}">
+				  
+				  </div>
+
+			</div>
+	
+			<div class="panel panel-primary" th:if="${account}">
+				<div class="panel-heading">Information of account!!</div>
+				<div class="panel-body">
+				 <div>
+				          <lable>Client:</lable>
+				         <label th:text="${account.client.name}"></label>
+				     </div>
+				    <div>
+				          <lable>Code Account:</lable>
+				         <label th:text="${account.codeAccount}"></label>
+				     </div>
+				     <div>
+				          <lable>Amount:</lable>
+				         <label th:text="${account.amount}"></label>
+				     </div>
+				     <div>
+				          <lable>Account Date Creation:</lable>
+				         <label th:text="${account.dateCreation}"></label>
+				     </div>
+				     <div>
+				          <lable>Type:</lable>
+				         <label th:text="${account.class.simpleName}"></label>
+				     </div>
+				      <div th:if="${account.class.simpleName == 'AccountCurrent'}">
+				          <lable>overdraft:</lable>
+				         <label th:text="${account.overdraft}"></label>
+				     </div>
+				      <div th:if="${account.class.simpleName == 'AccountSaving'}">
+				          <lable>Tax:</lable>
+				         <label th:text="${account.tax}"></label>
+				     </div>
+				   	</div>
+				
+				</div>
+
+			</div>
+		
+		<div class="col-md-6">
+		<div sec:authorize="hasRole('Role_ADMIN')">
+			<div class="panel panel-primary" th:if="${account}">
+				<div class="panel-heading">Operation on the account!!</div>
+				<div class="panel-body">
+				  <form th:action="@{/saveOperation}" method="post">
+				     <div>
+				       <label>Account</label>
+				       <input type="hidden" name="codeAccount" th:value="${codeAccount}" />
+				       <label th:text="${codeAccount}"></label>
+				     </div>
+				     <div>
+				       <input type="radio" name="operation" value="pay" checked="checked" 
+				       onchange="document.getElementById('fortransfer').style.display='none' " />
+				       
+				       <label>Payment</label>
+				          <input type="radio" name="operation" value="with" 
+				          onchange="document.getElementById('fortransfer').style.display='none' "
+				          />
+				       <label>withdraw</label>
+				          <input type="radio" name="operation" value="transfer" 
+				          onchange="document.getElementById('fortransfer').style.display='block' "
+				          />
+				       <label>transfer</label>
+				     </div>
+				     <div id="fortransfer" style="display:none">
+				       <label>pay:</label>
+				       <input type="text" name="codeAccount2"/>
+				     </div>
+				     <div>
+				       <label>amount:</label>
+				       <input type="text" name="amount"/>
+				     </div>
+				     <div class="text-danger" th:text="${#httpServletRequest.getParameter('exception')}">
+				     
+				     </div>
+				     <buton type="submit" class="btn btn-warning">Submit</buton>
+				  </form>
+				
+				</div>
+
+			</div>
+		
+		
+			<div class="panel panel-primary" th:if="${account}">
+				<div class="panel-heading">List of Operations!!!</div>
+				<div class="panel-body">
+				  <table class="table table-striped">
+				     <tr>
+				       <th>Name:</th><th>Type</th><th>Date creation:</th><th>Amount:</th>
+				     </tr>
+				     <tr th:each="o:${listOperations}">
+				       <td th:text="${o.noOperation}"> </td>
+				       <td th:text="${o.class.simpleName}"> </td>
+				       <td th:text="${o.dateCreation}"> </td>
+				       <td th:text="${o.amount}"> </td>
+				     </tr>
+				  </table>
+				  <div class="container">
+				     <ul class="nav nav-pills">
+				     
+				        <li th:each="p,status:${pages}">
+				          <a th:href="@{/consultAccount(codeAccount=${codeAccount},page=${status.index})}"
+				           th:text="${status.index}"></a>
+				        </li>
+				       
+				     </ul>
+				  
+				  </div>
+				</div>
+
+			</div>
+		</div>
+		</div>
+		</div>
+	
+  
+</body>
+</html>
